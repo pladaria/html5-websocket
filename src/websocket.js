@@ -2,6 +2,32 @@
 
 const NodeWebSocket = require('ws');
 
+/**
+ * Creates something similar to a WebApi MessageEvent
+ *
+ * https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent
+ *
+ * @param {Object} target
+ * @param {String|Blob|ArrayBuffer} data
+ */
+const MessageEvent = function(target, data) {
+    this.bubbles = false;
+    this.cancelable = false;
+    this.cancelBubble = false;
+    this.currentTarget = this;
+    this.data = data;
+    this.eventPhase = 0;
+    this.srcElement = this;
+    this.target = this;
+    this.timeStamp = Date.now();
+    this.type = 'message';
+};
+
+/**
+ * Creates something similar to a HTML5 WebSocket
+ *
+ * @param {String} address
+ */
 const WebSocket = function (address) {
 
     if (!this instanceof WebSocket) {
@@ -97,15 +123,7 @@ const WebSocket = function (address) {
 
     ws.on('message', (data, flags) => {
         // https://developer.mozilla.org/en-US/docs/Web/Events/message
-        const messageEvent = {
-            data,
-            target: this,
-            type: 'message',
-            bubbles: false,
-            cancelable: false,
-            eventPhase: 2,
-            timeStamp: Date.now(),
-        };
+        const messageEvent = new MessageEvent(this, data);
         eventListeners.message.forEach(fn =>
             process.nextTick(() => fn(messageEvent)));
 

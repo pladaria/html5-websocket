@@ -1,6 +1,6 @@
 # html5-websocket
 
-This module is a thin facade of [ws](https://www.npmjs.com/package/ws) which implements the standard [HTML5 WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) interface.
+This module is a thin layer over [ws](https://www.npmjs.com/package/ws) and implements the standard [HTML5 WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) interface.
 
 The motivation behind this module is to be able to write WebSocket based libraries that will run without changes in Node.js, Browsers or React Native apps.
 

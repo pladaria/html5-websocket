@@ -62,7 +62,7 @@ const WebSocket = function (address) {
         if (!Array.isArray(listeners)) {
             return;
         }
-        if (listeners.some(fn => fn === listener)) {
+        if (listeners.some((fn) => fn === listener)) {
             return;
         }
         listeners.push(listener);
@@ -88,12 +88,12 @@ const WebSocket = function (address) {
 
     const ws = new NodeWebSocket(address);
 
-    this.send = data => {
-        ws.send(data, function ack (error) {
+    this.send = (data) => {
+        ws.send(data, (error) => {
             if (!error) {
                 return;
             }
-            eventListeners.error.forEach(fn =>
+            eventListeners.error.forEach((fn) =>
                 process.nextTick(() => fn(error)));
 
             if (this.onerror) {
@@ -102,16 +102,16 @@ const WebSocket = function (address) {
         });
     };
 
-    ws.on('open', err => {
-        eventListeners.open.forEach(fn => process.nextTick(fn));
+    ws.on('open', (err) => {
+        eventListeners.open.forEach((fn) => process.nextTick(fn));
 
         if (this.onopen) {
             process.nextTick(this.onopen);
         }
     });
 
-    ws.on('close', err => {
-        eventListeners.close.forEach(fn => process.nextTick(fn));
+    ws.on('close', (err) => {
+        eventListeners.close.forEach((fn) => process.nextTick(fn));
 
         if (this.onclose) {
             process.nextTick(this.onclose);
@@ -121,7 +121,7 @@ const WebSocket = function (address) {
     ws.on('message', (data, flags) => {
         // https://developer.mozilla.org/en-US/docs/Web/Events/message
         const messageEvent = new MessageEvent(this, data);
-        eventListeners.message.forEach(fn =>
+        eventListeners.message.forEach((fn) =>
             process.nextTick(() => fn(messageEvent)));
 
         if (this.onmessage) {

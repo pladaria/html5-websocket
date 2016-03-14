@@ -10,7 +10,7 @@ const NodeWebSocket = require('ws');
  * @param {Object} target
  * @param {String|Blob|ArrayBuffer} data
  */
-const MessageEvent = function(target, data) {
+const MessageEvent = function (target, data) {
     this.bubbles = false;
     this.cancelable = false;
     this.cancelBubble = false;
@@ -31,10 +31,7 @@ const MessageEvent = function(target, data) {
 const WebSocket = function (address) {
 
     if (!this instanceof WebSocket) {
-        throw new TypeError(
-            "Failed to construct 'WebSocket': Please use the 'new' operator, " +
-            "this DOM object constructor cannot be called as a function."
-        );
+        throw new TypeError("Constructor WebSocket requires 'new'.");
     }
 
     this.url = address;

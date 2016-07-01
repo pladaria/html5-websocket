@@ -37,8 +37,6 @@ const WebSocket = function (url, protocols) {
         throw new TypeError("Constructor WebSocket requires 'new'.");
     }
 
-    const ws = new NodeWebSocket(url);
-
     this.url = url;
     this.protocol = protocols;
     this.readyState = this.CONNECTING;
@@ -49,6 +47,8 @@ const WebSocket = function (url, protocols) {
     this.onclose = noop;
     this.onerror = noop;
     this.onmessage = noop;
+
+    const ws = new NodeWebSocket(url, protocols);
 
     // DOM Level 2
     const eventListeners = {
@@ -65,7 +65,7 @@ const WebSocket = function (url, protocols) {
     this.addEventListener = (type, listener) => {
         const listeners = eventListeners[type];
         if (Array.isArray(listeners)) {
-            if (!listeners.some((fn) => fn === listener)) {
+            if (!listeners.some(fn => fn === listener)) {
                 listeners.push(listener);
             }
         }
@@ -83,9 +83,9 @@ const WebSocket = function (url, protocols) {
     };
 
     this.send = (data) => {
-        ws.send(data, (error) => {
+        ws.send(data, error => {
             if (error) {
-                eventListeners.error.forEach((fn) => fn(error));
+                eventListeners.error.forEach(fn => fn(error));
                 this.onerror(error);
             }
         });
@@ -98,21 +98,26 @@ const WebSocket = function (url, protocols) {
 
     ws.on('open', () => {
         this.readyState = this.OPEN;
-        eventListeners.open.forEach(fn);
+        eventListeners.open.forEach(fn => fn());
         this.onopen();
     });
 
     ws.on('close', () => {
         this.readyState = this.CLOSED;
-        eventListeners.close.forEach(fn);
+        eventListeners.close.forEach(fn => fn());
         this.onclose();
     });
 
-    ws.on('message', (data) => {
+    ws.on('message', data => {
         // https://developer.mozilla.org/en-US/docs/Web/Events/message
         const messageEvent = new MessageEvent(this, data);
-        eventListeners.message.forEach((fn) => fn(messageEvent));
+        eventListeners.message.forEach(fn => fn(messageEvent));
         this.onmessage(messageEvent);
+    });
+
+    ws.on('error', error => {
+        eventListeners.error.forEach(fn => fn(error));
+        this.onerror(error);
     });
 };
 
@@ -122,4 +127,3 @@ WebSocket.prototype.CLOSING = 2;
 WebSocket.prototype.CLOSED = 3;
 
 module.exports = WebSocket;
-

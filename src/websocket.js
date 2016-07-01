@@ -37,7 +37,7 @@ const WebSocket = function (url, protocols) {
         throw new TypeError("Constructor WebSocket requires 'new'.");
     }
 
-    const ws = new NodeWebSocket(address);
+    const ws = new NodeWebSocket(url);
 
     this.url = url;
     this.protocol = protocols;

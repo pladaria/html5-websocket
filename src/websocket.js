@@ -1,6 +1,7 @@
 'use strict';
 
 const NodeWebSocket = require('ws');
+const noop = () => {};
 
 /**
  * Creates something similar to a WebApi MessageEvent
@@ -23,27 +24,31 @@ const MessageEvent = function (target, data) {
     this.type = 'message';
 };
 
+// @todo CloseEvent
+
 /**
  * Creates something similar to a HTML5 WebSocket
  *
- * @param {String} address
+ * @param {String} url
  */
-const WebSocket = function (address) {
+const WebSocket = function (url, protocols) {
 
-    if (!this instanceof WebSocket) {
+    if (!(this instanceof WebSocket)) {
         throw new TypeError("Constructor WebSocket requires 'new'.");
     }
 
-    this.url = address;
-    this.protocol = '';
-    this.readyState = 0;
+    const ws = new NodeWebSocket(address);
+
+    this.url = url;
+    this.protocol = protocols;
+    this.readyState = this.CONNECTING;
     this.bufferedAmount = 0;
 
     // DOM Level 0
-    this.onopen = null;
-    this.onclose = null;
-    this.onerror = null;
-    this.onmessage = null;
+    this.onopen = noop;
+    this.onclose = noop;
+    this.onerror = noop;
+    this.onmessage = noop;
 
     // DOM Level 2
     const eventListeners = {
@@ -59,13 +64,11 @@ const WebSocket = function (address) {
      */
     this.addEventListener = (type, listener) => {
         const listeners = eventListeners[type];
-        if (!Array.isArray(listeners)) {
-            return;
+        if (Array.isArray(listeners)) {
+            if (!listeners.some((fn) => fn === listener)) {
+                listeners.push(listener);
+            }
         }
-        if (listeners.some((fn) => fn === listener)) {
-            return;
-        }
-        listeners.push(listener);
     };
 
     /**
@@ -74,65 +77,49 @@ const WebSocket = function (address) {
      */
     this.removeEventListener = (type, listener) => {
         const listeners = eventListeners[type];
-        if (!Array.isArray(listeners)) {
-            return;
+        if (Array.isArray(listeners)) {
+            eventListeners[type] = listeners.filter(fn => fn !== listener);
         }
-        listeners.some((fn, index) => {
-            if (fn === listener) {
-                listeners.splice(index, 1);
-                return true;
-            }
-            return false;
-        });
     };
-
-    const ws = new NodeWebSocket(address);
 
     this.send = (data) => {
         ws.send(data, (error) => {
-            if (!error) {
-                return;
-            }
-            eventListeners.error.forEach((fn) =>
-                process.nextTick(() => fn(error)));
-
-            if (this.onerror) {
-                process.nextTick(() => this.onerror(error));
+            if (error) {
+                eventListeners.error.forEach((fn) => fn(error));
+                this.onerror(error);
             }
         });
     };
 
     this.close = () => {
+        this.readyState = this.CLOSING;
         ws.close();
     };
 
-    ws.on('open', (err) => {
-        eventListeners.open.forEach((fn) => process.nextTick(fn));
-
-        if (this.onopen) {
-            process.nextTick(this.onopen);
-        }
+    ws.on('open', () => {
+        this.readyState = this.OPEN;
+        eventListeners.open.forEach(fn);
+        this.onopen();
     });
 
-    ws.on('close', (err) => {
-        eventListeners.close.forEach((fn) => process.nextTick(fn));
-
-        if (this.onclose) {
-            process.nextTick(this.onclose);
-        }
+    ws.on('close', () => {
+        this.readyState = this.CLOSED;
+        eventListeners.close.forEach(fn);
+        this.onclose();
     });
 
-    ws.on('message', (data, flags) => {
+    ws.on('message', (data) => {
         // https://developer.mozilla.org/en-US/docs/Web/Events/message
         const messageEvent = new MessageEvent(this, data);
-        eventListeners.message.forEach((fn) =>
-            process.nextTick(() => fn(messageEvent)));
-
-        if (this.onmessage) {
-            process.nextTick(() => this.onmessage(messageEvent));
-        }
+        eventListeners.message.forEach((fn) => fn(messageEvent));
+        this.onmessage(messageEvent);
     });
 };
+
+WebSocket.prototype.CONNECTING = 0;
+WebSocket.prototype.OPEN = 1;
+WebSocket.prototype.CLOSING = 2;
+WebSocket.prototype.CLOSED = 3;
 
 module.exports = WebSocket;
 

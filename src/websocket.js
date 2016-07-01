@@ -102,6 +102,10 @@ const WebSocket = function (address) {
         });
     };
 
+    this.close = () => {
+        ws.close();
+    };
+
     ws.on('open', (err) => {
         eventListeners.open.forEach((fn) => process.nextTick(fn));
 

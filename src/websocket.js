@@ -92,8 +92,15 @@ const WebSocket = function (url, protocols) {
     };
 
     this.close = () => {
-        this.readyState = this.CLOSING;
         ws.close();
+        if (this.readyState === this.CONNECTING) {
+            // Browser's WebSocket emits a `close` event when
+            // transitioning from CONNECTING to CLOSING
+            process.nextTick(() => {
+                ws.emit('close');
+            });
+        }
+        this.readyState = this.CLOSING;
     };
 
     ws.on('open', () => {

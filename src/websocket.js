@@ -1,7 +1,6 @@
 'use strict';
 
 const NodeWebSocket = require('ws');
-const noop = () => {};
 
 /**
  * Creates something similar to a WebApi MessageEvent
@@ -43,10 +42,10 @@ const WebSocket = function (url, protocols) {
     this.bufferedAmount = 0;
 
     // DOM Level 0
-    this.onopen = noop;
-    this.onclose = noop;
-    this.onerror = noop;
-    this.onmessage = noop;
+    this.onopen = null;
+    this.onclose = null;
+    this.onerror = null;
+    this.onmessage = null;
 
     const ws = new NodeWebSocket(url, protocols);
 
@@ -106,26 +105,26 @@ const WebSocket = function (url, protocols) {
     ws.on('open', () => {
         this.readyState = this.OPEN;
         eventListeners.open.forEach(fn => fn());
-        this.onopen();
+        this.onopen && this.onopen();
     });
 
     ws.on('close', () => {
         this.readyState = this.CLOSED;
         eventListeners.close.forEach(fn => fn());
-        this.onclose();
+        this.onclose && this.onclose();
     });
 
     ws.on('message', data => {
         // https://developer.mozilla.org/en-US/docs/Web/Events/message
         const messageEvent = new MessageEvent(this, data);
         eventListeners.message.forEach(fn => fn(messageEvent));
-        this.onmessage(messageEvent);
+        this.onmessage && this.onmessage(messageEvent);
     });
 
     ws.on('error', error => {
         this.close(); // maybe this should check the error type
         eventListeners.error.forEach(fn => fn(error));
-        this.onerror(error);
+        this.onerror && this.onerror(error);
     });
 };
 

@@ -123,6 +123,7 @@ const WebSocket = function (url, protocols) {
     });
 
     ws.on('error', error => {
+        this.close(); // maybe this should check the error type
         eventListeners.error.forEach(fn => fn(error));
         this.onerror(error);
     });

@@ -1,2 +1,6 @@
 yarn-error.log
 yarn.lock
+tests
+.eslintrc
+jsconfig.json
+.npmrc

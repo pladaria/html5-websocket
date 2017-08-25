@@ -114,9 +114,9 @@ const WebSocket = function (url, protocols) {
         this.onclose && this.onclose();
     });
 
-    ws.addEventListener('message', data => {
+    ws.addEventListener('message', event => {
         // https://developer.mozilla.org/en-US/docs/Web/Events/message
-        const messageEvent = new MessageEvent(this, data);
+        const messageEvent = new MessageEvent(this, event.data);
         eventListeners.message.forEach(fn => fn(messageEvent));
         this.onmessage && this.onmessage(messageEvent);
     });

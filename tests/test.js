@@ -23,14 +23,18 @@ test.serial.cb('send and receive', t => {
     wss.on('connection', (client) => {
         client.on('message', (msg) => {
             t.is(msg, ANY_MESSAGE);
-            wss.close();
-            t.end();
+            client.send(`ACK ${ANY_MESSAGE}`);
         })
-    })
+    });
 
     const ws = new WebSocket(`ws://localhost:${ANY_PORT}`)
 
     ws.onopen = () => {
         ws.send(ANY_MESSAGE);
     };
+
+    ws.onmessage = (msg) => {
+        t.is(msg.data, `ACK ${ANY_MESSAGE}`);
+        t.end();
+    }
 });

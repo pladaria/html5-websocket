@@ -35,6 +35,7 @@ test.serial.cb('send and receive', t => {
 
     ws.onmessage = (msg) => {
         t.is(msg.data, `ACK ${ANY_MESSAGE}`);
+        wss.close();
         t.end();
     }
 });

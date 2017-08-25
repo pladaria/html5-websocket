@@ -102,26 +102,26 @@ const WebSocket = function (url, protocols) {
         this.readyState = this.CLOSING;
     };
 
-    ws.on('open', () => {
+    ws.addEventListener('open', () => {
         this.readyState = this.OPEN;
         eventListeners.open.forEach(fn => fn());
         this.onopen && this.onopen();
     });
 
-    ws.on('close', () => {
+    ws.addEventListener('close', () => {
         this.readyState = this.CLOSED;
         eventListeners.close.forEach(fn => fn());
         this.onclose && this.onclose();
     });
 
-    ws.on('message', data => {
+    ws.addEventListener('message', data => {
         // https://developer.mozilla.org/en-US/docs/Web/Events/message
         const messageEvent = new MessageEvent(this, data);
         eventListeners.message.forEach(fn => fn(messageEvent));
         this.onmessage && this.onmessage(messageEvent);
     });
 
-    ws.on('error', error => {
+    ws.addEventListener('error', error => {
         this.close(); // maybe this should check the error type
         eventListeners.error.forEach(fn => fn(error));
         this.onerror && this.onerror(error);

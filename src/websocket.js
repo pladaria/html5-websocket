@@ -55,6 +55,8 @@ const WebSocket = function (url, protocols) {
         close: [],
         message: [],
         error: [],
+        ping: [],
+        pong: [],
     };
 
     /**
@@ -125,6 +127,16 @@ const WebSocket = function (url, protocols) {
         this.close(); // maybe this should check the error type
         eventListeners.error.forEach(fn => fn(error));
         this.onerror && this.onerror(error);
+    });
+
+    ws.addEventListener('ping', payloadBuf => {
+        eventListeners.ping.forEach(fn => fn(payloadBuf));
+        this.onping && this.onping(payloadBuf);
+    });
+
+    ws.addEventListener('pong', payloadBuf => {
+        eventListeners.pong.forEach(fn => fn(payloadBuf));
+        this.onpong && this.onpong(payloadBuf);
     });
 };
 

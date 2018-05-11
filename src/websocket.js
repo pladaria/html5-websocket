@@ -84,8 +84,7 @@ const WebSocket = function (url, protocols) {
     this.send = (data) => {
         ws.send(data, error => {
             if (error) {
-                eventListeners.error.forEach(fn => fn(error));
-                this.onerror(error);
+              ws.emit('error', error);
             }
         });
     };

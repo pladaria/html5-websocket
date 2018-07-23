@@ -108,9 +108,9 @@ const WebSocket = function (url, protocols) {
         this.onopen && this.onopen();
     });
 
-    ws.addEventListener('close', () => {
+    ws.addEventListener('close', event => {
         this.readyState = this.CLOSED;
-        eventListeners.close.forEach(fn => fn());
+        eventListeners.close.forEach(fn => fn(event));
         this.onclose && this.onclose();
     });
 

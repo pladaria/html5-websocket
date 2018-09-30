@@ -1,3 +1,9 @@
+# IMPORTANT
+
+:warning: **Consider this library as deprecated. It was created to give ws the WebSocket interface. This is no longer needed because latest versions of ws already implement this interface.**
+
+---
+
 # html5-websocket
 
 This module implements the standard [HTML5 WebSocket API](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) as a thin layer over the great [ws](https://www.npmjs.com/package/ws) library.

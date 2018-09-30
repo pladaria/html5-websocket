@@ -1,4 +1,4 @@
-# IMPORTANT
+# DEPRECATED
 
 :warning: **Consider this library as deprecated. It was created to expose `ws` with a `WebSocket` interface. This is no longer needed because latest versions of `ws` already implement this interface.**
 
